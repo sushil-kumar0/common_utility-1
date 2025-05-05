@@ -45,7 +45,7 @@ public class DemandRollOver {
 
 	@PostMapping("/rollover")
 	public String rollover(@RequestBody String obj, @RequestParam("ulb") String ulbName,
-			@RequestParam("fy") String fYear, @RequestParam("token") String token) {
+			@RequestParam("fy") String fYear, @RequestParam("token") String token, @RequestParam("euuid") String euuid) {
 		String result = "";
 		String[] fyr = fYear.split("-");
 
@@ -53,7 +53,7 @@ public class DemandRollOver {
 
 		ZoneId zoneId = ZoneId.of("Etc/UTC");
 
-		LocalDateTime fromTime = LocalDateTime.parse(fyr[0] + "-04-01T00:00:00");
+		LocalDateTime fromTime = LocalDateTime.parse(fyr[0] + "-04-01T12:00:00");
 		long taxPeriodFrom = fromTime.atZone(zoneId).toInstant().toEpochMilli();
 
 		LocalDateTime toTime = LocalDateTime.parse(fyr[1] + "-03-31T23:59:59");
@@ -69,6 +69,8 @@ public class DemandRollOver {
 		for (int i = 0; i < pidAray.length; i++) {
 
 			JSONObject searchRequestInfo = new JSONObject();
+			
+			JSONObject userInfo = new JSONObject();
 
 			JSONObject assessmentInfo = new JSONObject();
 
@@ -104,6 +106,9 @@ public class DemandRollOver {
 //			int amtPrcnt = amt * 15 / 100;
 //			int finalAmt = amt + amtPrcnt;
 //			System.out.println(finalAmt);
+			 
+			 userInfo.put("uuid", euuid);
+			 userInfo.put("type", "EMPLOYEE");
 
 			searchRequestInfo.put("api_id", "Rainmaker");
 			searchRequestInfo.put("ver", ".01");
@@ -113,6 +118,10 @@ public class DemandRollOver {
 			searchRequestInfo.put("key", "");
 			searchRequestInfo.put("msgId", "20170310130900|en_IN");
 			searchRequestInfo.put("authToken", token);
+			searchRequestInfo.put("userInfo", userInfo);
+			
+			
+			
 
 			assessmentInfo.put("tenantId", ulbName);
 			assessmentInfo.put("propertyId", ptId);
