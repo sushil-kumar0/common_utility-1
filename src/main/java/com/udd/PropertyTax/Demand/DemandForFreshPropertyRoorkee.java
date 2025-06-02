@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.io.FileWriter;
+
+import org.springframework.boot.ExitCodeEvent;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -159,6 +161,9 @@ public class DemandForFreshPropertyRoorkee {
 
 			Main.put("RequestInfo", searchRequestInfo);
 			Main.put("Assessment", assessmentInfo);
+			
+			System.out.println(Main.toString());
+		
 
 			System.out.println("Demand Initiated for PropertId: "+ptId);
 			String fetchUserDetailsUrl = "https://nagarsewa.uk.gov.in/property-services/assessment/_create?tenantId="
@@ -204,7 +209,7 @@ public class DemandForFreshPropertyRoorkee {
 	
 	@PostMapping("/demand2years_roorkee")
 	public String demand2years(@RequestBody String obj, @RequestParam("ulb") String ulbName,
-			@RequestParam("fy") String fYear, @RequestParam("token") String token) {
+			@RequestParam("fy") String fYear, @RequestParam("token") String token, @RequestParam("euuid") String euuid) {
 		String result = "";
 		String[] fyr = fYear.split("-");
 
@@ -227,18 +232,20 @@ public class DemandForFreshPropertyRoorkee {
 
 		String[] fynew = new String[10];
 				int countfuss = fyss.length;
-				System.out.println("hello");
+
 				for(int i=0; i<countfuss; i++) {
 					
-					LocalDateTime fromTime = LocalDateTime.parse(fyr[0] + "-04-01T12:00:00");
+					LocalDateTime fromTime = LocalDateTime.parse(fyss[i] + "-04-01T00:00:00");
 					long taxPeristartDateodFrom = fromTime.atZone(zoneId).toInstant().toEpochMilli();
 
-					LocalDateTime toTime = LocalDateTime.parse(fyr[1] + "-03-31T23:59:59");
+					LocalDateTime toTime = LocalDateTime.parse(fyss[i] + "-03-31T23:59:59");
 					long taxPeriodTo = toTime.atZone(zoneId).toInstant().toEpochMilli();
 					
 					startDate.put(fyss[i],taxPeristartDateodFrom);
 					endDate.put(fyss[i],taxPeriodTo);
 				}
+				
+				 
 
 		String[] pidAray = obj.split(",");
 
@@ -264,8 +271,8 @@ public class DemandForFreshPropertyRoorkee {
 			JSONObject PayerObj2 = new JSONObject();
 
 			JSONObject DemandDetailsObj = new JSONObject();
-			JSONObject DemandDetailsObjs = new JSONObject();
-			JSONObject DemandDetailsObjs2 = new JSONObject();
+			//JSONObject DemandDetailsObjs = new JSONObject();
+			//JSONObject DemandDetailsObjs2 = new JSONObject();
 			JSONObject DemandDetailsObj2 = new JSONObject();
 			JSONObject DemandDetailsObj3 = new JSONObject();
 
@@ -276,7 +283,7 @@ public class DemandForFreshPropertyRoorkee {
 			JSONArray Demand2 = new JSONArray();
 			JSONArray Demand3 = new JSONArray();
 			JSONArray DemandDetails = new JSONArray();
-
+			JSONObject userInfo = new JSONObject();
 			String[] objArray = pidAray[i].split(":");
 			String uuid = objArray[0];
 			String ptId = objArray[1];
@@ -289,6 +296,10 @@ public class DemandForFreshPropertyRoorkee {
 //			int amtPrcnt = amt * 15 / 100;
 //			int finalAmt = amt + amtPrcnt;
 //			System.out.println(finalAmt);
+			 
+			 
+			 userInfo.put("uuid", euuid);
+			 userInfo.put("type", "EMPLOYEE");
 
 			searchRequestInfo.put("api_id", "Rainmaker");
 			searchRequestInfo.put("ver", ".01");
@@ -298,11 +309,12 @@ public class DemandForFreshPropertyRoorkee {
 			searchRequestInfo.put("key", "");
 			searchRequestInfo.put("msgId", "20170310130900|en_IN");
 			searchRequestInfo.put("authToken", token);
+			searchRequestInfo.put("userInfo", userInfo);
 
 			assessmentInfo.put("tenantId", ulbName);
 			assessmentInfo.put("propertyId", ptId);
 			assessmentInfo.put("financialYear", fyr[0] + "-" + fYearText);
-			assessmentInfo.put("assessmentDate", "1714852041000");
+			assessmentInfo.put("assessmentDate", "1748843934000");
 			assessmentInfo.put("source", "LEGACY_RECORD");
 			assessmentInfo.put("channel", "CFC_COUNTER");
 			assessmentInfo.put("status", "ACTIVE");
@@ -316,8 +328,8 @@ public class DemandForFreshPropertyRoorkee {
 			DemandObj.put("consumerCode", ptId);
 			DemandObj.put("consumerType", consumerType);
 			DemandObj.put("businessService", "PT");
-			DemandObj.put("taxPeriodFrom", "1711929600000");
-			DemandObj.put("taxPeriodTo", "1743465599000");
+			DemandObj.put("taxPeriodFrom", startDate.get("2024"));
+			DemandObj.put("taxPeriodTo", endDate.get("2025"));
 
 			DemandDetailsObj.put("taxHeadMasterCode", "PT_TAX");
 			DemandDetailsObj.put("taxAmount", amount);
@@ -325,13 +337,13 @@ public class DemandForFreshPropertyRoorkee {
 
 //			For Haldwani
 			
-			DemandDetailsObjs.put("taxHeadMasterCode", "SWATCHATHA_TAX");
-			DemandDetailsObjs.put("taxAmount", amount);
-			DemandDetailsObjs.put("collectionAmount", 0);
+//			DemandDetailsObjs.put("taxHeadMasterCode", "SWATCHATHA_TAX");
+//			DemandDetailsObjs.put("taxAmount", amount);
+//			DemandDetailsObjs.put("collectionAmount", 0);
 
-			Demand2.add(DemandDetailsObj);
+//			Demand2.add(DemandDetailsObjs);
 //			For Haldwani
-			Demand2.add(DemandDetailsObjs);
+			Demand2.add(DemandDetailsObj);
 
 			PayerObj.put("uuid", uuid);
 
@@ -340,15 +352,12 @@ public class DemandForFreshPropertyRoorkee {
 			
 			
 			
-			
-			
-			
 			DemandObj2.put("tenantId", ulbName);
 			DemandObj2.put("consumerCode", ptId);
 			DemandObj2.put("consumerType", consumerType);
 			DemandObj2.put("businessService", "PT");
-			DemandObj2.put("taxPeriodFrom", "1680307200000");
-			DemandObj2.put("taxPeriodTo", "1711929599000");
+			DemandObj2.put("taxPeriodFrom", startDate.get("2025"));
+			DemandObj2.put("taxPeriodTo", endDate.get("2026"));
 
 			DemandDetailsObj3.put("taxHeadMasterCode", "PT_TAX");
 			DemandDetailsObj3.put("taxAmount", amount);
@@ -356,13 +365,14 @@ public class DemandForFreshPropertyRoorkee {
 
 //			For Haldwani
 			
-			DemandDetailsObjs2.put("taxHeadMasterCode", "SWATCHATHA_TAX");
-			DemandDetailsObjs2.put("taxAmount", amount);
-			DemandDetailsObjs2.put("collectionAmount", 0);
-
-			Demand3.add(DemandDetailsObj3);
+//			DemandDetailsObjs2.put("taxHeadMasterCode", "SWATCHATHA_TAX");
+//			DemandDetailsObjs2.put("taxAmount", amount);
+//			DemandDetailsObjs2.put("collectionAmount", 0);
+//
+//			Demand3.add(DemandDetailsObjs2);
 //			For Haldwani
-			Demand3.add(DemandDetailsObjs2);
+			
+			Demand3.add(DemandDetailsObj3);
 
 			PayerObj2.put("uuid", uuid);
 
@@ -387,9 +397,12 @@ public class DemandForFreshPropertyRoorkee {
 			
 			
 			System.out.println(Main.toString());
-			//System.out.println("Demand Initiated for PropertId: "+ptId);
+			
+			 
 			String fetchUserDetailsUrl = "https://nagarsewa.uk.gov.in/property-services/assessment/_create?tenantId="
 					+ ulbName;
+ 
+			
 			try {
 				HttpEntity<String> searchRequesthead = new HttpEntity<String>(Main.toString(), headers);
 				response = restTemplate.postForEntity(fetchUserDetailsUrl, searchRequesthead, String.class);
