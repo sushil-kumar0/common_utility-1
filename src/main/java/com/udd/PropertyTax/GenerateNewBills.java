@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class GenerateNewBills {
 	
+	//expire the old bill and generate the new bill
 	@PostMapping("/generate-bills")
 	public String GenerateNewBillsController(@RequestBody String obj,@RequestParam("ulb") String ulb,@RequestParam("token") String token) {
 		String result = "";
