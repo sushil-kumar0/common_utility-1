@@ -125,7 +125,7 @@ public class NoticeGeneration {
 			int Amount = Integer.parseInt(amount); 
 			int SAmount = 0;
 			int rebate = 0;
-			int Total = Amount; 
+			int Total = Amount*2; 
 			String IssueDate = "31/05/2025";
 			String DueDate = "31/03/2026";
 			
