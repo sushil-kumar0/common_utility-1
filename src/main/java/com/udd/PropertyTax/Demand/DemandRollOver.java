@@ -416,22 +416,5 @@ public class DemandRollOver {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	public static void main(String arr[]) {
-String fyss[]= {"2018","2019","2020","2021","2022","2023","2024","2025","2026"};
- 
-Map<String,String> mp = new HashMap<String,String>();
-
-String[] fynew = new String[10];
-		int countfuss = fyss.length;
-		System.out.println("hello");
-		for(int i=0; i<countfuss; i++) {
-			System.out.println(i);
-			fynew[i]=fyss[i];
-		mp.put(fyss[i],fyss[i]);
-		}
-		System.out.println(mp);
-	}
 
 }
